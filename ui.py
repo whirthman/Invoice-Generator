@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from docxtpl import DocxTemplate
 
 root = tk.Tk()
 
@@ -16,6 +17,107 @@ def center_window(root, width, height):
 
 # Create Window
 def create_windows():
+    # Creatin frame container
+    container = tk.Frame(root)
+    container.pack(padx=10, pady=20)
+
+
+    # Task  Functions
+    # Clear Item
+    def clear_item():
+        quantity_spinner.delete(0,tk.END)
+        description_entry.delete(0,tk.END)
+        unit_price_spinner.delete(0,tk.END)
+
+    # Add Items
+    def add_items():
+        quantity = int(quantity_spinner.get())
+        description = description_entry.get()
+        unit_price = int(unit_price_spinner.get())
+        total = quantity * unit_price
+
+        items = [quantity, description, unit_price, total]
+
+        tabview.insert("", "end", values=items)   
+
+        clear_item()
+
+    # New Invoice
+    def new_invoice():
+        firstname_entry.delete(0,tk.END)
+        lastname_entry.delete(0,tk.END)
+        phone_entry.delete(0,tk.END)
+        clear_item()
+        tabview.delete(*tabview.get_children())
+
+    # Generate Invoice
+    def generate_invoice():
+
+
+    # Creating Labels & Input
+    # First Row
+    # First Name
+    firstname_label = tk.Label(container, text="First Name")
+    firstname_label.grid(row=0, column=0)
+
+    firstname_entry = tk.Entry(container)
+    firstname_entry.grid(row=1, column=0, pady=8)
+
+    # Last Name
+    lastname_label = tk.Label(container, text="Last Name")
+    lastname_label.grid(row=0, column= 1)
+
+    lastname_entry = tk.Entry(container)
+    lastname_entry.grid(row=1, column=1)
+
+    # Phones
+    phone_label = tk.Label(container, text="Phone")
+    phone_label.grid(row=0, column=2)
+
+    phone_entry = tk.Entry(container)
+    phone_entry.grid(row=1, column=2)
+
+    # Second Row
+    quantity_label = tk.Label(container, text="Quantity")
+    quantity_label.grid(row=3, column=1)
+
+    quantity_spinner = tk.Spinbox(container, from_= 0, to=100)
+    quantity_spinner.grid(row=4, column=1, pady=5)
+
+    description_label = tk.Label(container, text="Description")
+    description_label.grid(row=3, column=0)
+
+    description_entry = tk.Entry(container)
+    description_entry.grid(row=4, column=0)
+
+    unit_price_label = tk.Label(container, text="Unit Price")
+    unit_price_label.grid(row=3, column=2)
+
+    unit_price_spinner = tk.Spinbox(container, from_=0, to=10000, increment=0.5)
+    unit_price_spinner.grid(row=4, column=2)
+
+    # Row 3 // BTN
+    add_items_btn = tk.Button(container, text="Add Item", padx=12, pady=2, command=add_items)
+    add_items_btn.grid(row=5, column=2)
+
+    # Row 4 // Table
+    columns = ("description", "quantity", "unit_price", "total")
+    tabview = ttk.Treeview(container, columns=columns, show="headings")
+    tabview.heading("description", text="Description")
+    tabview.heading("quantity", text="Quantity")
+    tabview.heading("unit_price", text="Unit Price")
+    tabview.heading("total", text= "Total")
+
+    tabview.grid(row=6, columnspan=3, padx=16, pady=20)
+
+    # Row 5 / Button
+    generate_invoice_btn = tk.Button(container, text="Generate Invoice", padx=2, pady=6)
+    generate_invoice_btn.grid(row=7, sticky="news", columnspan=3)
+
+    new_invoice_btn = tk.Button(container, padx=2, pady=6, text="New Invoice", command=new_invoice)
+    new_invoice_btn.grid(row=8, sticky="news", columnspan=3, pady=5)
+
+
     # Windows Details
     root.title("Invoice Generator App")
     root.iconbitmap("./icon/favicon.ico")    
