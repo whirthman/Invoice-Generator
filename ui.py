@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
+from tkinter import messagebox
 from docxtpl import DocxTemplate
 
 root = tk.Tk()
@@ -23,6 +25,8 @@ def create_windows():
 
 
     # Task  Functions
+    invoice_list = []
+
     # Clear Item
     def clear_item():
         quantity_spinner.delete(0,tk.END)
@@ -38,6 +42,8 @@ def create_windows():
 
         items = [quantity, description, unit_price, total]
 
+        invoice_list.append(items)
+
         tabview.insert("", "end", values=items)   
 
         clear_item()
@@ -52,6 +58,34 @@ def create_windows():
 
     # Generate Invoice
     def generate_invoice():
+        doc = DocxTemplate("./invoice_template/invoice_template.docx")
+
+        name = firstname_entry.get() + " " + lastname_entry.get()
+        phone = phone_entry.get()
+        salestax = 0.1
+        subtotal = 0
+        for items in invoice_list:
+             subtotal += items[3]
+        print(subtotal)
+
+        total = subtotal - (subtotal * salestax)
+
+        doc.render({
+            "name" : name,
+            "phone" : phone,
+            "invoice_list" : invoice_list,
+            "subtotal" : subtotal,
+            "salestax" : salestax,
+            "total" : total
+        })
+
+        # Saving file with windows dialog
+        save_path = filedialog.asksaveasfilename(title="Save Invoice As", defaultextension=".docx")
+        
+        if save_path:
+            doc.save(save_path)
+            messagebox.showinfo("Success", "Invoice Generated and Saved Successfully!")
+            
 
 
     # Creating Labels & Input
@@ -79,16 +113,16 @@ def create_windows():
 
     # Second Row
     quantity_label = tk.Label(container, text="Quantity")
-    quantity_label.grid(row=3, column=1)
+    quantity_label.grid(row=3, column=0)
 
     quantity_spinner = tk.Spinbox(container, from_= 0, to=100)
-    quantity_spinner.grid(row=4, column=1, pady=5)
+    quantity_spinner.grid(row=4, column=0, pady=5)
 
     description_label = tk.Label(container, text="Description")
-    description_label.grid(row=3, column=0)
+    description_label.grid(row=3, column=1)
 
     description_entry = tk.Entry(container)
-    description_entry.grid(row=4, column=0)
+    description_entry.grid(row=4, column=1)
 
     unit_price_label = tk.Label(container, text="Unit Price")
     unit_price_label.grid(row=3, column=2)
@@ -111,7 +145,7 @@ def create_windows():
     tabview.grid(row=6, columnspan=3, padx=16, pady=20)
 
     # Row 5 / Button
-    generate_invoice_btn = tk.Button(container, text="Generate Invoice", padx=2, pady=6)
+    generate_invoice_btn = tk.Button(container, text="Generate Invoice", padx=2, pady=6, command=generate_invoice)
     generate_invoice_btn.grid(row=7, sticky="news", columnspan=3)
 
     new_invoice_btn = tk.Button(container, padx=2, pady=6, text="New Invoice", command=new_invoice)
